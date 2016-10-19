@@ -17,13 +17,13 @@ FileSystem::FileSystem() {
 
 	this->root.folderVec[0].folderVec.push_back(Folder("A1", &this->root.folderVec[0]));
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A11", &this->root.folderVec[0].folderVec[0]));
-	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[1]));
+	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[0]));
 
 	//removeFolder("A");
-	GoToFolder("A/A1");
-	for (const auto & item : this->currentDir->folderVec)
+	//GoToFolder("A/A1");
+	/*for (const auto & item : this->currentDir->folderVec)
 			std::cout << item.myFolderName << std::endl;
-
+*/
 
 	/*for (const auto & item : this->root.folderVec[0].folderVec)
 		std::cout << item.myFolderName << std::endl;
@@ -77,12 +77,14 @@ FileSystem::~FileSystem() {
 					const Folder tmp(name,nullptr);
 		 			auto it = std::find(currentDir->folderVec.begin(), currentDir->folderVec.end(), tmp);
 
-		 			if (it != currentDir->folderVec.end()){
-						int index = std::distance( currentDir->folderVec.begin(), it );
-						currentDir=&currentDir->folderVec[index];
-						name="";
+					if (it != currentDir->folderVec.end()) {
+						int index = std::distance(currentDir->folderVec.begin(), it);
+						currentDir = &currentDir->folderVec[index];
+						name = "";
 						i++;
 					}
+					else
+						return false;
 				}
   		}
 			//name = name + entireDir[i];

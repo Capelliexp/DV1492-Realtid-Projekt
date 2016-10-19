@@ -5,6 +5,7 @@
 
 const int MAXCOMMANDS = 8;
 const int NUMAVAILABLECOMMANDS = 15;
+bool test;
 
 std::string availableCommands[NUMAVAILABLECOMMANDS] = {
     "quit","format","ls","create","cat","createImage","restoreImage",
@@ -27,7 +28,7 @@ int main(void) {
     FileSystem f; // <<<--------
 
 
-    return 0;
+    //return 0;
 
     do {
         std::cout << user << ":" << currentDir << "$ ";
@@ -84,25 +85,36 @@ int main(void) {
 
             case 12:{ // cd
                 userCommand.erase (0,3);
-                bool test = f.GoToFolder(userCommand);
-                if(test == true && userCommand==".."){
+                test = f.GoToFolder(userCommand);
+
+				if (test == true && currentDir == "/") {
+					currentDir = currentDir + userCommand;
+				}
+                else if(test == true && userCommand==".."){
                   //auto it = std::find(currentDir.rbegin(), currentDir.rend(), "/");
                   //currentDir.erase(it,currentDir.end());
                   size_t pos = currentDir.rfind("/");
-                  currentDir=currentDir.substr(0,pos);
-                }
-                else if(test == true && currentDir == "/"){
-                  currentDir = currentDir + userCommand;
+				  if (pos != 0)
+					  currentDir = currentDir.substr(0, pos);
+				  else
+					  currentDir = currentDir.substr(0, 1);
                 }
                 else if(test == true){
                   currentDir = currentDir + "/" + userCommand;
                 }
+				else
+				{
+					break;
+				}
                 break;
               }
 
             case 13: // pwd
-                cout<<currentDir<<endl;
-                break;
+			{
+				std::cout << currentDir << std::endl;
+				break;
+			}
+                
 
             case 14: // help
                 std::cout << help() << std::endl;
