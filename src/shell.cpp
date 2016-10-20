@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <stdio.h>
 #include "filesystem.h"
 
 const int MAXCOMMANDS = 8;
@@ -54,11 +55,25 @@ int main(void) {
                 f.ListContent();
                 break;
 
-            case 3: // create
+            case 3:{ // create
+                userCommand.erase (0,7);
+                std::string name = userCommand;
+                std::cout << "write content:" << std::endl;
+                std::string content;
+                std::cin >> content;
+                int rtn = f.createFile(userCommand, content);
+                if(rtn != 1){
+                    std::cout << "error creating file" << std::endl;
+                }
                 break;
+            }
 
-            case 4: // cat
+            case 4:{ // cat
+                userCommand.erase (0,4);
+                std::string rtn = f.PrintFileContent(userCommand);
+                std::cout << rtn << std::endl;
                 break;
+            }
 
             case 5: // createImage
                 break;
@@ -66,12 +81,23 @@ int main(void) {
             case 6: // restoreImage
                 break;
 
-            case 7: // rm
+            case 7:{ // rm
+                userCommand.erase (0,3);
+                f.removeFile(userCommand);
                 break;
+            }
 
-            case 8: // cp
-                break;
+            case 8:{ // cp
+                userCommand.erase (0,3);
+                std::size_t split = userCommand.find(" ");
+                std::string file1, file2;
+                userCommand.copy(file1, 0, split-1);
+                userCommand.copy(file2, split+1, userCommand.length();
 
+                f.CopyFile(file1, file2);
+               break; 
+            }
+                
             case 9: // append - behövs ej
                 break;
 
@@ -107,7 +133,7 @@ int main(void) {
 					break;
 				}
                 break;
-              }
+            }
 
             case 13: // pwd
 			{

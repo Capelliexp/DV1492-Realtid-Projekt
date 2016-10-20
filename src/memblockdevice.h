@@ -5,6 +5,8 @@
 class MemBlockDevice: public BlockDevice
 {
 public:
+    int freeBlockArr[250];
+    
     MemBlockDevice(int nrOfBlocks = 250);
     MemBlockDevice(const MemBlockDevice &other);
 

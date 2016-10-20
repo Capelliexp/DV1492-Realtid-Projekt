@@ -64,13 +64,13 @@ public:
      */
 
     /* This function creates a file in the filesystem */
-    //void createFile(std::string currentDir, std::string fileName, std::string content);
+    int createFile(std::string fileName, std::string content);
+
+    // /* Removes a file in the filesystem */
+    void removeFile(std::string fileName);
 
     // /* Creates a folder in the filesystem */
     void CreateFolder(std::string folderName);
-
-    // /* Removes a file in the filesystem */
-    // removeFile(std::string currentDir, std::string fileName);
 
     //  Removes a folder in the filesystem
     void RemoveFolder(std::string folderName);
@@ -82,6 +82,10 @@ public:
 
     // /* This function will get all the files and folders in the specified folder */
     void ListContent();
+
+    std::string PrintFileContent(std::string fileName);
+
+    void CopyFile(std::string file1, std::string file2);
 
     // Folder GetCurrentFolder(std::string currentDir);   //har jag skapat
 };
