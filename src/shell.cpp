@@ -46,25 +46,32 @@ int main(void) {
                 std::cout << "Exiting\n";
                 break;
 
-            case 1: // format
-                //f.format();
-                break;
+            case 1:{ // format
+				f = FileSystem();
+				break;
+			}
+                
 
-            case 2: // ls
-                std::cout << "Listing directory" << std::endl;
-                f.ListContent();
-                break;
+			case 2: { // ls
+				std::string returnValue = f.ListContent();
+				std::cout << returnValue << std::endl;
+				break;
+			}
 
             case 3:{ // create
                 userCommand.erase (0,7);
                 std::string name = userCommand;
                 std::cout << "write content:" << std::endl;
                 std::string content;
-                std::cin >> content;
+                //std::cin >> content;
+				getline(std::cin, content);
                 int rtn = f.createFile(userCommand, content);
-                if(rtn != 1){
-                    std::cout << "error creating file" << std::endl;
-                }
+				if (rtn == -1) {
+					std::cout << "error writing to block" << std::endl;
+				}
+				else if (rtn == -2) {
+					std::cout << "out of memory" << std::endl;
+				}
                 break;
             }
 
@@ -91,10 +98,13 @@ int main(void) {
                 userCommand.erase (0,3);
                 std::size_t split = userCommand.find(" ");
                 std::string file1, file2;
-                userCommand.copy(file1, 0, split-1);
-                userCommand.copy(file2, split+1, userCommand.length();
+                //userCommand.copy(file1.c_str(), 0, split-1);
+                //userCommand.copy(*file2, split+1, userCommand.length());
+				file1 = userCommand.substr(0, split);
+				file2 = userCommand.substr(split + 1, userCommand.length());
 
-                f.CopyFile(file1, file2);
+				if (f.CopyFile(file1, file2) != true)
+					std::cout << "Error in copy operation" << std::endl;
                break; 
             }
                 

@@ -15,6 +15,8 @@ FileSystem::FileSystem() {
 	this->root.folderVec.push_back(Folder("C", &this->root));
 	this->root.folderVec.push_back(Folder("D", &this->root));
 
+	createFile("Apa","Apan ater banan");
+
 	this->root.folderVec[0].folderVec.push_back(Folder("A1", &this->root.folderVec[0]));
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A11", &this->root.folderVec[0].folderVec[0]));
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[0]));
@@ -35,33 +37,37 @@ FileSystem::FileSystem() {
 FileSystem::~FileSystem() {
 }
 
-int FileSystem::createFile(std::string fileName, std::string content){
-	for(int i = 0; i < 255; i++){
+int FileSystem::createFile(std::string fileName, std::string content) {
+	char * finalContent = new char[512];
+	std::copy(content.begin(), content.end(), finalContent);
+	finalContent[content.size()] = '§';
+	
+	for(int i = 0; i < 250; i++){
 		if(mMemblockDevice.freeBlockArr[i] == 0){
-			if(mMemblockDevice.writeBlock(i, content) == 1){
+			if(mMemblockDevice.writeBlock(i, finalContent) == 1){
 				mMemblockDevice.freeBlockArr[i] = 1;
-				currentDir->fileVec.push_back(File(fileName, i));
+				currentDir->fileVec.push_back(File(fileName, i, &mMemblockDevice));
+				delete[] finalContent;
 				return 1;
 			}
 			else{
+				delete[] finalContent;
 				return -1;
 			}
 		}
 	}
-	return -1;
+	delete[] finalContent;
+	return -2;
 }
 
 void FileSystem::removeFile(std::string fileName){
 	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), fileName);
 
 	if (it != currentDir->fileVec.end()){
+		mMemblockDevice.freeBlockArr[currentDir->fileVec[it].id] = 0;
 		currentDir->fileVec.erase(it);
-
-		int i = std::distance(currentDir->fileVec.begin(), it );
-		mMemblockDevice.freeBlockArr[i] = 0;
 	}
 }
-
 
 void FileSystem::CreateFolder(std::string folderName){
 	currentDir->folderVec.push_back(Folder(folderName , currentDir));
@@ -87,7 +93,7 @@ bool FileSystem::GoToFolder(std::string folderName){
 			if(name == ".."){
 				if(currentDir == &root)
 				{
-					std::cout<<"I am Groot"<<std::endl;
+					//std::cout<<"I am Groot"<<std::endl;
 					return false;
 				}
 				else
@@ -118,12 +124,17 @@ void FileSystem::listDir(){
 
 }
 
-void FileSystem::ListContent(){
-	for (const auto & item : this->currentDir->folderVec)
-		std::cout << item.myFolderName << std::endl;
+std::string FileSystem::ListContent(){
+	std::string rtn;
+	for (const auto & item : this->currentDir->folderVec) {
+		rtn += item.myFolderName + "\n";
+	}
 
-	for (const auto & item : this->currentDir->fileVec)
-		std::cout << item.name << std::endl;
+
+	for (const auto & thing : this->currentDir->fileVec) {
+		rtn += thing.name + "\n";
+	}
+	return rtn;
 }
 
 std::string FileSystem::PrintFileContent(std::string fileName){
@@ -133,31 +144,22 @@ std::string FileSystem::PrintFileContent(std::string fileName){
 		int i = std::distance(currentDir->fileVec.begin(), it );
 		int block = currentDir->fileVec[i].id;
 		std::string rtn = mMemblockDevice.readBlock(block).toString();
+		std::size_t split = rtn.find("§");
+		rtn=rtn.substr(0,split);
 		return rtn;
 	}
 	return "error";
 }
 
- /*GetCurrentFolder(std::string currentDir){
- 	std::string entireDir = currentDir;
- 	Folder* folderPointer = &root;
- 	std::string folderName;
- 	std::size_t pos
+bool FileSystem::CopyFile(std::string file1, std::string file2)
+{
+	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), file1);
 
- 	char a[];
- 	entireDir.c_str();
- 	std::string name=NULL;
-
- 	for(int i=0;i<sizeOf(entireDir);i++)
- 	{
- 		if(entireDir[i]=='/'&& i!=0)
- 		{
-
- 		}
-
- 		name += entireDir[i];
-
- 	}
-
- 	return folderPointer;
-}*/
+	if (it != currentDir->fileVec.end()) {
+		createFile(file2, PrintFileContent(file1));
+	}
+	else
+		return false;
+		
+	return true;
+}

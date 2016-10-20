@@ -15,14 +15,17 @@ private:
     public:
         std::string name;
         int id;
+		MemBlockDevice* memCopy;
 
-        File(std::string fileName = "New File", int blockNr = -1) {
+        File(std::string fileName = "New File", int blockNr = -1, MemBlockDevice* pointer= nullptr) {
             name = fileName;    //OBS! måste kasta error om namnet innehåller /
             id = blockNr;
+			memCopy = pointer;
         }
         ~File(){
-
+			memCopy->freeBlockArr[id] = 0;
         }
+
         bool operator == (const std::string &filename)
         {
             return this->name == filename;
@@ -46,6 +49,7 @@ private:
         ~Folder(){
 
         }
+
         bool operator==(const Folder &other)
         {
           return this->myFolderName==other.myFolderName;
@@ -81,11 +85,11 @@ public:
     void listDir();
 
     // /* This function will get all the files and folders in the specified folder */
-    void ListContent();
+    std::string ListContent();
 
     std::string PrintFileContent(std::string fileName);
 
-    void CopyFile(std::string file1, std::string file2);
+    bool CopyFile(std::string file1, std::string file2);
 
     // Folder GetCurrentFolder(std::string currentDir);   //har jag skapat
 };

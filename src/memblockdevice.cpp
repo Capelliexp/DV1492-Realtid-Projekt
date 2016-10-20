@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 MemBlockDevice::MemBlockDevice(int nrOfBlocks): BlockDevice(nrOfBlocks) {
-
+	std::fill_n(this->freeBlockArr, 250, 0);
 }
 
 MemBlockDevice::MemBlockDevice(const MemBlockDevice &other) : BlockDevice(other) {

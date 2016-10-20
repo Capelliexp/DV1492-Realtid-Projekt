@@ -7,8 +7,6 @@ BlockDevice::BlockDevice(int nrOfBlocks) {
     else
         this->nrOfBlocks = 250;
 
-    std::fill_n(this->freeBlockArr, 250, 0);
-
     this->memBlocks = new Block[this->nrOfBlocks];
     this->freePointer = 0;
 
