@@ -166,3 +166,63 @@ bool FileSystem::CopyFile(std::string file1, std::string file2)
 		
 	return true;
 }
+
+char * fp;
+FILE * file;
+char rowC[1024];
+int rowI;
+
+void FileSystem::restoreImage(std::string filePath) {
+	fp = new char[filePath.length() + 1];
+	FILE * file = fopen(fp, "r");
+
+	fscanf(file, "%i \n", rowI);
+	int nrOfFolders = rowI;
+	fscanf(file, "%i \n", rowI);
+	int nrOfFiles = rowI;
+
+	for (int i = 0; i < nrOfFiles; i++) {
+		std::string filename, content;
+		fscanf(file, "%s %s \n", filename, content);
+		createFile(filename, content);
+	}
+
+	for (int i = 0; i < nrOfFolders; i++) {
+		fscanf(file, "%i \n", rowI);
+		int childNrOfFolders = rowI;
+		fscanf(file, "%i \n", rowI);
+		int childNrOfFiles = rowI;
+
+		fscanf(file, "%s \n", rowC);
+		std::string name = rowC;
+		CreateFolder(name);
+
+		currentDir = &currentDir->folderVec[i];
+		recursiveFunction(name, childNrOfFolders, childNrOfFiles);
+	}
+	currentDir = currentDir->parent;
+}
+
+void FileSystem::recursiveFunction(std::string name, int nrOfFolders, int nrOfFiles) {
+
+	for (int i = 0; i < nrOfFiles; i++) {
+		std::string filename, content;
+		fscanf(file, "%s %s \n", filename, content);
+		createFile(filename, content);
+	}
+
+	for (int i = 0; i < nrOfFolders; i++) {
+		fscanf(file, "%i \n", rowI);
+		int childNrOfFolders = rowI;
+		fscanf(file, "%i \n", rowI);
+		int childNrOfFiles = rowI;
+
+		fscanf(file, "%s \n", rowC);
+		std::string name = rowC;
+		CreateFolder(name);
+
+		currentDir = &currentDir->folderVec[i];
+		recursiveFunction(name, childNrOfFolders, childNrOfFiles);
+	}
+	currentDir = currentDir->parent;
+}

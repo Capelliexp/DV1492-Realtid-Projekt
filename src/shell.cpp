@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <sstream>
 #include <string>
 #include <stdio.h>
@@ -85,9 +85,13 @@ int main(void) {
             case 5: // createImage
                 break;
 
-            case 6: // restoreImage
-                break;
+			case 6: { // restoreImage
+				f = FileSystem();
+				userCommand.erase(0, 13);
+				f.restoreImage(userCommand);
 
+				break;
+			}
             case 7:{ // rm
                 userCommand.erase (0,3);
                 f.removeFile(userCommand);
