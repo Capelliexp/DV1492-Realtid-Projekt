@@ -1,16 +1,19 @@
 #include "filesystem.h"
 #include <string>
-#include <string.h>
 #include <cstring>
+#include <string.h>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 FileSystem::FileSystem() {
 	this->root = Folder("/");
 	this->currentDir = &root;
+	this->root.parent = &root;
 
 
+	// Blocket under ger ett enkelt filsystem 
 	this->root.folderVec.push_back(Folder("A", &this->root));
 	this->root.folderVec.push_back(Folder("B", &this->root));
 	this->root.folderVec.push_back(Folder("C", &this->root));
@@ -19,21 +22,14 @@ FileSystem::FileSystem() {
 	createFile("Apa","Apan ater banan");
 
 	this->root.folderVec[0].folderVec.push_back(Folder("A1", &this->root.folderVec[0]));
+	this->root.folderVec[0].folderVec.push_back(Folder("A2", &this->root.folderVec[0]));
+	this->currentDir = &this->root.folderVec[0].folderVec[1];
+	createFile("hest", "hester eter gres");
+	this->currentDir = &root;
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A11", &this->root.folderVec[0].folderVec[0]));
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[0]));
 
-	//removeFolder("A");
-	//GoToFolder("A/A1");
-
-	/*for (const auto & item : this->currentDir->folderVec)	//skriver ut allt innehåll i nuvarande mappen
-			std::cout << item.myFolderName << std::endl;
-*/
-
-	/*for (const auto & item : this->root.folderVec[0].folderVec)	//skriver ut allt innehåll i A
-		std::cout << item.myFolderName << std::endl;
-	for (const auto & item : this->root.folderVec)	//skriver ut allt innehåll i root
-			std::cout << item.myFolderName << std::endl;
-*/
+	
 }
 
 FileSystem::~FileSystem() {
@@ -65,7 +61,7 @@ int FileSystem::createFile(std::string fileName, std::string content) {
 void FileSystem::removeFile(std::string fileName){
 	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), fileName);
 
-	if (it != currentDir->fileVec.end()){
+	if (it != currentDir->fileVec.end()) {
 		int i = std::distance(currentDir->fileVec.begin(), it);
 		mMemblockDevice.freeBlockArr[currentDir->fileVec[i].id] = 0;
 		currentDir->fileVec.erase(it);
@@ -87,7 +83,6 @@ void FileSystem::RemoveFolder(std::string folderName){
 bool FileSystem::GoToFolder(std::string folderName){
 	std::string name="";
 	int length=folderName.length();
-	//std::cout << length << std::endl;
 	char * entireDir = new char [length+1];
   	std::strcpy(entireDir, folderName.c_str());
 
@@ -96,7 +91,6 @@ bool FileSystem::GoToFolder(std::string folderName){
 			if(name == ".."){
 				if(currentDir == &root)
 				{
-					//std::cout<<"I am Groot"<<std::endl;
 					return false;
 				}
 				else
@@ -116,7 +110,6 @@ bool FileSystem::GoToFolder(std::string folderName){
 						return false;
 				}
   		}
-			//name = name + entireDir[i];
 
   		name += entireDir[i];
   	}
@@ -167,62 +160,74 @@ bool FileSystem::CopyFile(std::string file1, std::string file2)
 	return true;
 }
 
-char * fp;
-FILE * file;
-char rowC[1024];
-int rowI;
+void FileSystem::CreateImage(std::string sysName)
+{
+	currentDir = &root;
+	std::ofstream file;
+	file.open(sysName);
+	recursiveCreate(currentDir, file);
+	file.close();
+	
+}
 
-void FileSystem::restoreImage(std::string filePath) {
-	fp = new char[filePath.length() + 1];
-	FILE * file = fopen(fp, "r");
-
-	fscanf(file, "%i \n", rowI);
-	int nrOfFolders = rowI;
-	fscanf(file, "%i \n", rowI);
-	int nrOfFiles = rowI;
-
-	for (int i = 0; i < nrOfFiles; i++) {
-		std::string filename, content;
-		fscanf(file, "%s %s \n", filename, content);
-		createFile(filename, content);
+void FileSystem::recursiveCreate(Folder * dir, std::ofstream &file)
+{
+	currentDir = dir;
+	int tmp = currentDir->folderVec.size();
+	int tmp2 = currentDir->fileVec.size();
+	file << tmp << std::endl;
+	file << tmp2 << std::endl;
+	for (int i = 0; i < tmp2; i++)
+	{
+		file << currentDir->fileVec[i].name << "=" << PrintFileContent(currentDir->fileVec[i].name) << std::endl;
 	}
-
-	for (int i = 0; i < nrOfFolders; i++) {
-		fscanf(file, "%i \n", rowI);
-		int childNrOfFolders = rowI;
-		fscanf(file, "%i \n", rowI);
-		int childNrOfFiles = rowI;
-
-		fscanf(file, "%s \n", rowC);
-		std::string name = rowC;
-		CreateFolder(name);
-
-		currentDir = &currentDir->folderVec[i];
-		recursiveFunction(name, childNrOfFolders, childNrOfFiles);
+	for (int i = 0; i < tmp; i++)
+	{
+		file << currentDir->folderVec[i].myFolderName << std::endl;
+		recursiveCreate(&currentDir->folderVec[i], file);
 	}
 	currentDir = currentDir->parent;
 }
 
-void FileSystem::recursiveFunction(std::string name, int nrOfFolders, int nrOfFiles) {
-
-	for (int i = 0; i < nrOfFiles; i++) {
-		std::string filename, content;
-		fscanf(file, "%s %s \n", filename, content);
-		createFile(filename, content);
+void FileSystem::restoreImage(std::string filePath) {
+	currentDir = &root;
+	std::string line;
+	int tmp, tmp2;
+	std::ifstream myfile(filePath);
+	if (myfile.is_open())
+	{
+		recursiveFunction(currentDir, myfile);
 	}
+	myfile.close();
+}
 
-	for (int i = 0; i < nrOfFolders; i++) {
-		fscanf(file, "%i \n", rowI);
-		int childNrOfFolders = rowI;
-		fscanf(file, "%i \n", rowI);
-		int childNrOfFiles = rowI;
+void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
+{
+	currentDir = dir;
+	std::string line;
+	int tmp;
+	int tmp2;
 
-		fscanf(file, "%s \n", rowC);
-		std::string name = rowC;
-		CreateFolder(name);
-
-		currentDir = &currentDir->folderVec[i];
-		recursiveFunction(name, childNrOfFolders, childNrOfFiles);
+	
+	getline(file, line);
+	tmp = std::stoi(line);
+	getline(file, line);
+	tmp2 = std::stoi(line);
+	for (int i = 0; i < tmp2; i++)
+	{
+		getline(file, line);
+		std::string name, content;
+		size_t pos = line.find("=");
+		name = line.substr(0, pos);
+		content = line.substr(pos+1);
+		createFile(name, content);
 	}
+	for (int j = 0; j < tmp; j++)
+	{
+		getline(file, line);
+		CreateFolder(line);
+		recursiveFunction(&currentDir->folderVec[j], file);
+	}
+	
 	currentDir = currentDir->parent;
 }

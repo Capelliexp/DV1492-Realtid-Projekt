@@ -1,0 +1,28 @@
+4
+1
+Apa=hester eter gres
+A
+2
+0
+A1
+2
+0
+A11
+0
+0
+A12
+0
+0
+A2
+0
+1
+hest=hester eter gres
+B
+0
+0
+C
+0
+0
+D
+0
+0

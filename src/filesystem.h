@@ -3,11 +3,14 @@
 
 #include "memblockdevice.h"
 #include <string>
+#include <iostream>
+#include <fstream>
 
 class FileSystem
 {
 private:
     MemBlockDevice mMemblockDevice;
+	
 
     // Here you can add your own data structures
 
@@ -20,10 +23,10 @@ private:
         File(std::string fileName = "New File", int blockNr = -1, MemBlockDevice* pointer= nullptr) {
             name = fileName;    //OBS! måste kasta error om namnet innehåller /
             id = blockNr;
-			memCopy = pointer;
+			//memCopy = pointer;
         }
         ~File(){
-			memCopy->freeBlockArr[id] = 0;
+			//memCopy->freeBlockArr[id] = 0;
         }
 
         bool operator == (const std::string &filename)
@@ -58,6 +61,7 @@ private:
 
     Folder root;
     Folder * currentDir;
+	
 public:
     FileSystem();
     ~FileSystem();
@@ -92,6 +96,16 @@ public:
     bool CopyFile(std::string file1, std::string file2);
 
     // Folder GetCurrentFolder(std::string currentDir);   //har jag skapat
+
+	void restoreImage(std::string filePath);
+	//void recursiveFunction(std::string name, int nrOfFolders, int nrOfFiles);
+	void recursiveFunction(Folder * dir, std::ifstream &file);
+
+	void CreateImage(std::string sysName);
+
+	void recursiveCreate(Folder * dir, std::ofstream &outputFile);
+
+	
 };
 
 #endif // FILESYSTEM_H
