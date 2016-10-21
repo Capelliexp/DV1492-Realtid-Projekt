@@ -1,31 +1,38 @@
-//%=Folder
+﻿//%=Folder
 //@=File
 //
 
 
-% mappnamn1 /
+
+% mappnamn1
 @ filnamn1 content§
 @ filnamn2 content§
-% mappnamn2 /
-% mappnamn3 /
-% mappnamn4 /
-% mappnamn5 /
-% mappnamn6 mappnamn1
-% mappnamn7 mappnamn2
+% mappnamn2
+% mappnamn3
+% mappnamn4
+% mappnamn5
+% mappnamn6 
+% mappnamn7
 
+
+FILE * file = fopen(FilePath, "r");
 
 char lineHeader[128] // maxtecken på 1 rad
 
 while(1){
-	int res = fscanf(file.txt, "%s", lineHeader)
+	int res = fscanf(file, "%s", lineHeader)
 	if(res == EOF)
 		break;
 
 	if(strcm(lineHeader, @) == 0){
+		string name, parent;
+		fscanf(file, "%s %s \n", name, parent);
 		f.CreateFolder("name"));
 	}
 	
 	else if(strcm(lineHeader, %) == 0){
+		string filename, content;
+		fscanf(file, "%s %s \n", filename, content);
 		f.CreateFile(filnamn, content);
 	}
 	

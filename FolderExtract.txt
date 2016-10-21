@@ -1,0 +1,26 @@
+FILE * file = fopen(FilePath, "r");
+
+char row[1024];
+
+int recursiveFunction(name, int nrOfFolders, int nrOfFiles){
+	
+	for(int i = 0; i < nrOfFiles; i++){
+		fscanf(file, "%s %s \n", filename, content);
+		createFile(filename, content);
+	}
+	
+	for(int i = 0; i < nrOfFolders; i++){
+		fscanf(file, "%i \n", row);
+		int childNrOfFolders = row;
+		fscanf(file, "%i \n", row);
+		int childNrOfFiles = row;
+		
+		fscanf(file, "%s \n", row);
+		string name = row;
+		createFolder(row);
+
+		currentDir=currentDir->folderVec[i];
+		recursiveFunction(childNrOfFolders,  childNrOfFiles );
+	}
+	currentDir = currentDir->parent;
+}
