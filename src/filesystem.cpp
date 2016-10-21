@@ -1,5 +1,6 @@
 #include "filesystem.h"
 #include <string>
+#include <string.h>
 #include <cstring>
 #include <vector>
 #include <iostream>
@@ -23,13 +24,14 @@ FileSystem::FileSystem() {
 
 	//removeFolder("A");
 	//GoToFolder("A/A1");
-	/*for (const auto & item : this->currentDir->folderVec)
+
+	/*for (const auto & item : this->currentDir->folderVec)	//skriver ut allt innehåll i nuvarande mappen
 			std::cout << item.myFolderName << std::endl;
 */
 
-	/*for (const auto & item : this->root.folderVec[0].folderVec)
+	/*for (const auto & item : this->root.folderVec[0].folderVec)	//skriver ut allt innehåll i A
 		std::cout << item.myFolderName << std::endl;
-	for (const auto & item : this->root.folderVec)
+	for (const auto & item : this->root.folderVec)	//skriver ut allt innehåll i root
 			std::cout << item.myFolderName << std::endl;
 */
 }
@@ -64,7 +66,8 @@ void FileSystem::removeFile(std::string fileName){
 	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), fileName);
 
 	if (it != currentDir->fileVec.end()){
-		mMemblockDevice.freeBlockArr[currentDir->fileVec[it].id] = 0;
+		int i = std::distance(currentDir->fileVec.begin(), it);
+		mMemblockDevice.freeBlockArr[currentDir->fileVec[i].id] = 0;
 		currentDir->fileVec.erase(it);
 	}
 }
