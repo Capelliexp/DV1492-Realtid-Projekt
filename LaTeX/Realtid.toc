@@ -1,0 +1,16 @@
+\select@language {swedish}
+\contentsline {section}{Inneh\r all}{1}
+\contentsline {section}{\numberline {1}Inledning}{2}
+\contentsline {subsection}{\numberline {1.1}F\IeC {\"o}rberedelse}{2}
+\contentsline {subsection}{\numberline {1.2}Milj\IeC {\"o}}{2}
+\contentsline {subsection}{\numberline {1.3}Teori}{2}
+\contentsline {subsection}{\numberline {1.4}Resurser}{2}
+\contentsline {section}{\numberline {2}Uppgift}{3}
+\contentsline {subsection}{\numberline {2.1}Metod}{3}
+\contentsline {subsection}{\numberline {2.2}Funktioner}{3}
+\contentsline {subsection}{\numberline {2.3}Klassdiagram}{5}
+\contentsline {subsection}{\numberline {2.4}Resultat}{6}
+\contentsline {section}{\numberline {3}Avslutande}{6}
+\contentsline {subsection}{\numberline {3.1}Slutsats}{6}
+\contentsline {subsection}{\numberline {3.2}Tidsredovisning}{6}
+\contentsline {section}{Referenser}{6}
