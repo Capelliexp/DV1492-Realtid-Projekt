@@ -14,7 +14,7 @@ FileSystem::FileSystem() {
 
 
 	// Blocket under ger ett enkelt filsystem 
-	this->root.folderVec.push_back(Folder("A", &this->root));
+	/*this->root.folderVec.push_back(Folder("A", &this->root));
 	this->root.folderVec.push_back(Folder("B", &this->root));
 	this->root.folderVec.push_back(Folder("C", &this->root));
 	this->root.folderVec.push_back(Folder("D", &this->root));
@@ -27,7 +27,7 @@ FileSystem::FileSystem() {
 	createFile("hest", "hester eter gres");
 	this->currentDir = &root;
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A11", &this->root.folderVec[0].folderVec[0]));
-	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[0]));
+	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[0]));*/
 
 	
 }
@@ -38,7 +38,7 @@ FileSystem::~FileSystem() {
 int FileSystem::createFile(std::string fileName, std::string content) {
 	char * finalContent = new char[512];
 	std::copy(content.begin(), content.end(), finalContent);
-	finalContent[content.size()] = '§';
+	finalContent[content.size()] = '$';
 	
 	for(int i = 0; i < 250; i++){
 		if(mMemblockDevice.freeBlockArr[i] == 0){
@@ -140,7 +140,7 @@ std::string FileSystem::PrintFileContent(std::string fileName){
 		int i = std::distance(currentDir->fileVec.begin(), it );
 		int block = currentDir->fileVec[i].id;
 		std::string rtn = mMemblockDevice.readBlock(block).toString();
-		std::size_t split = rtn.find("§");
+		std::size_t split = rtn.find("$");
 		rtn=rtn.substr(0,split);
 		return rtn;
 	}
@@ -165,6 +165,9 @@ void FileSystem::CreateImage(std::string sysName)
 	currentDir = &root;
 	std::ofstream file;
 	file.open(sysName);
+	//std::ofstream file(sysName);
+	//std::fstream file;
+	//file.open(sysName);
 	recursiveCreate(currentDir, file);
 	file.close();
 	
@@ -192,13 +195,17 @@ void FileSystem::recursiveCreate(Folder * dir, std::ofstream &file)
 void FileSystem::restoreImage(std::string filePath) {
 	currentDir = &root;
 	std::string line;
-	int tmp, tmp2;
+	std::cout<<filePath<<std::endl;
 	std::ifstream myfile(filePath);
+	//std::fstream myfile(filePath);
 	if (myfile.is_open())
 	{
 		recursiveFunction(currentDir, myfile);
 	}
+	else
+		std::cout<<"Can't file"<<std::endl;
 	myfile.close();
+	currentDir=&root;
 }
 
 void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
@@ -207,24 +214,30 @@ void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
 	std::string line;
 	int tmp;
 	int tmp2;
+	std::cout<<"error check 1"<<std::endl;
 
 	
-	getline(file, line);
+	std::getline(file, line);
 	tmp = std::stoi(line);
-	getline(file, line);
+	std::cout<<"error check 2: "<< tmp <<std::endl;
+	std::getline(file, line);
 	tmp2 = std::stoi(line);
+	std::cout<<"error check 2: "<< tmp2 <<std::endl<<std::endl;
 	for (int i = 0; i < tmp2; i++)
 	{
-		getline(file, line);
+		std::getline(file, line);
 		std::string name, content;
 		size_t pos = line.find("=");
 		name = line.substr(0, pos);
 		content = line.substr(pos+1);
-		createFile(name, content);
+		int error=createFile(name, content);
+		std::cout<<"error check 3: "<< name << " " << content << "error: " << error <<std::endl;
+		std::cout<<PrintFileContent(name)<<std::endl;
 	}
 	for (int j = 0; j < tmp; j++)
 	{
-		getline(file, line);
+		std::getline(file, line);
+		std::cout<<"error check 4: "<< line <<std::endl;
 		CreateFolder(line);
 		recursiveFunction(&currentDir->folderVec[j], file);
 	}
