@@ -105,6 +105,8 @@ public:
 
 	void recursiveCreate(Folder * dir, std::ofstream &outputFile);
 
+    void test();
+
 	
 };
 

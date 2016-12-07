@@ -10,7 +10,7 @@
 FileSystem::FileSystem() {
 	this->root = Folder("/");
 	this->currentDir = &root;
-	this->root.parent = &root;
+	this->root.parent = currentDir;
 
 
 	// Blocket under ger ett enkelt filsystem 
@@ -44,7 +44,7 @@ int FileSystem::createFile(std::string fileName, std::string content) {
 		if(mMemblockDevice.freeBlockArr[i] == 0){
 			if(mMemblockDevice.writeBlock(i, finalContent) == 1){
 				mMemblockDevice.freeBlockArr[i] = 1;
-				currentDir->fileVec.push_back(File(fileName, i, &mMemblockDevice));
+				this->currentDir->fileVec.push_back(File(fileName, i, &mMemblockDevice));
 				delete[] finalContent;
 				return 1;
 			}
@@ -59,61 +59,73 @@ int FileSystem::createFile(std::string fileName, std::string content) {
 }
 
 void FileSystem::removeFile(std::string fileName){
-	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), fileName);
+	auto it = std::find(this->currentDir->fileVec.begin(), this->currentDir->fileVec.end(), fileName);
 
-	if (it != currentDir->fileVec.end()) {
-		int i = std::distance(currentDir->fileVec.begin(), it);
-		mMemblockDevice.freeBlockArr[currentDir->fileVec[i].id] = 0;
-		currentDir->fileVec.erase(it);
+	if (it != this->currentDir->fileVec.end()) {
+		int i = std::distance(this->currentDir->fileVec.begin(), it);
+		mMemblockDevice.freeBlockArr[this->currentDir->fileVec[i].id] = 0;
+		this->currentDir->fileVec.erase(it);
 	}
 }
 
 void FileSystem::CreateFolder(std::string folderName){
-	currentDir->folderVec.push_back(Folder(folderName , currentDir));
+	this->currentDir->folderVec.push_back(Folder(folderName , this->currentDir));
 }
 
 void FileSystem::RemoveFolder(std::string folderName){
 	const Folder tmp(folderName,nullptr);
-	auto it = std::find(currentDir->folderVec.begin(), currentDir->folderVec.end(), tmp);
+	auto it = std::find(this->currentDir->folderVec.begin(), this->currentDir->folderVec.end(), tmp);
 
-	if (it != currentDir->folderVec.end())
-		currentDir->folderVec.erase(it);
+	if (it != this->currentDir->folderVec.end())
+		this->currentDir->folderVec.erase(it);
  }
 
+// bool FileSystem::GoToFolder(std::string folderName){
+// 	std::string name="";
+// 	int length=folderName.length();
+// 	char * entireDir = new char [length+1];
+//   	std::strcpy(entireDir, folderName.c_str());
+
+//   	for(int i=0;i<=length;i++){
+//   		if((entireDir[i]=='/' && i != 0) || (i == length && name!="")){
+// 			if(name == ".."){
+// 				if(this->currentDir == &root)
+// 				{
+// 					this->currentDir = this->currentDir->parent;
+// 					return false;
+// 				}
+// 				else
+// 					this->currentDir = this->currentDir->parent;
+// 				}
+// 			else{
+// 				const Folder tmp(name,nullptr);
+// 		 		auto it = std::find(this->currentDir->folderVec.begin(), this->currentDir->folderVec.end(), tmp);
+
+// 				if (it != this->currentDir->folderVec.end()) {
+// 					int index = std::distance(this->currentDir->folderVec.begin(), it);
+// 					this->currentDir = &this->currentDir->folderVec[index];
+// 					name = "";
+// 					i++;
+// 				}
+// 				else
+// 					return false;
+// 				}
+//   		}
+
+//   		name += entireDir[i];
+//   	}
+// 		return true;
+// }
+
 bool FileSystem::GoToFolder(std::string folderName){
-	std::string name="";
-	int length=folderName.length();
-	char * entireDir = new char [length+1];
-  	std::strcpy(entireDir, folderName.c_str());
+	if (folderName==".." && this->currentDir->myFolderName=="/")
+	{
+		this->currentDir = this->currentDir->parent;
+		return false;
+	}
 
-  	for(int i=0;i<=length;i++){
-  		if((entireDir[i]=='/' && i != 0) || (i == length && name!="")){
-			if(name == ".."){
-				if(currentDir == &root)
-				{
-					return false;
-				}
-				else
-					currentDir = currentDir->parent;
-				}
-				else{
-					const Folder tmp(name,nullptr);
-		 			auto it = std::find(currentDir->folderVec.begin(), currentDir->folderVec.end(), tmp);
-
-					if (it != currentDir->folderVec.end()) {
-						int index = std::distance(currentDir->folderVec.begin(), it);
-						currentDir = &currentDir->folderVec[index];
-						name = "";
-						i++;
-					}
-					else
-						return false;
-				}
-  		}
-
-  		name += entireDir[i];
-  	}
-		return true;
+	return true;
+	tim ska fixa
 }
 
 void FileSystem::listDir(){
@@ -134,11 +146,11 @@ std::string FileSystem::ListContent(){
 }
 
 std::string FileSystem::PrintFileContent(std::string fileName){
-	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), fileName);
+	auto it = std::find(this->currentDir->fileVec.begin(), this->currentDir->fileVec.end(), fileName);
 
-	if (it != currentDir->fileVec.end()){
-		int i = std::distance(currentDir->fileVec.begin(), it );
-		int block = currentDir->fileVec[i].id;
+	if (it != this->currentDir->fileVec.end()){
+		int i = std::distance(this->currentDir->fileVec.begin(), it );
+		int block = this->currentDir->fileVec[i].id;
 		std::string rtn = mMemblockDevice.readBlock(block).toString();
 		std::size_t split = rtn.find("$");
 		rtn=rtn.substr(0,split);
@@ -149,9 +161,9 @@ std::string FileSystem::PrintFileContent(std::string fileName){
 
 bool FileSystem::CopyFile(std::string file1, std::string file2)
 {
-	auto it = std::find(currentDir->fileVec.begin(), currentDir->fileVec.end(), file1);
+	auto it = std::find(this->currentDir->fileVec.begin(), this->currentDir->fileVec.end(), file1);
 
-	if (it != currentDir->fileVec.end()) {
+	if (it != this->currentDir->fileVec.end()) {
 		createFile(file2, PrintFileContent(file1));
 	}
 	else
@@ -162,55 +174,68 @@ bool FileSystem::CopyFile(std::string file1, std::string file2)
 
 void FileSystem::CreateImage(std::string sysName)
 {
-	currentDir = &root;
+	this->currentDir = &root;
 	std::ofstream file;
 	file.open(sysName);
 	//std::ofstream file(sysName);
 	//std::fstream file;
 	//file.open(sysName);
-	recursiveCreate(currentDir, file);
+	recursiveCreate(this->currentDir, file);
 	file.close();
 	
 }
 
 void FileSystem::recursiveCreate(Folder * dir, std::ofstream &file)
 {
-	currentDir = dir;
-	int tmp = currentDir->folderVec.size();
-	int tmp2 = currentDir->fileVec.size();
+	this->currentDir = dir;
+	int tmp = this->currentDir->folderVec.size();
+	int tmp2 = this->currentDir->fileVec.size();
 	file << tmp << std::endl;
 	file << tmp2 << std::endl;
 	for (int i = 0; i < tmp2; i++)
 	{
-		file << currentDir->fileVec[i].name << "=" << PrintFileContent(currentDir->fileVec[i].name) << std::endl;
+		file << this->currentDir->fileVec[i].name << "=" << PrintFileContent(this->currentDir->fileVec[i].name) << std::endl;
 	}
 	for (int i = 0; i < tmp; i++)
 	{
-		file << currentDir->folderVec[i].myFolderName << std::endl;
-		recursiveCreate(&currentDir->folderVec[i], file);
+		file << this->currentDir->folderVec[i].myFolderName << std::endl;
+		recursiveCreate(&this->currentDir->folderVec[i], file);
 	}
-	currentDir = currentDir->parent;
+	this->currentDir = this->currentDir->parent;
 }
 
 void FileSystem::restoreImage(std::string filePath) {
-	currentDir = &root;
-	std::string line;
+	//this->currentDir = &root;
+	//std::string line;
 	std::cout<<filePath<<std::endl;
 	std::ifstream myfile(filePath);
 	//std::fstream myfile(filePath);
 	if (myfile.is_open())
 	{
-		recursiveFunction(currentDir, myfile);
+		recursiveFunction(this->currentDir, myfile);
 	}
 	else
 		std::cout<<"Can't file"<<std::endl;
 	myfile.close();
-	currentDir=&root;
+	//this->currentDir=&root;
+	std::cout<<std::endl<<"this->currentDir pekar på: "<<this->currentDir->myFolderName<<" som har "<<this->currentDir->folderVec.size()<<" mappar."<<std::endl;
+	for (int h = 0; h < this->currentDir->folderVec.size(); h++)
+	{
+		std::cout<<this->currentDir->folderVec[h].myFolderName<<std::endl;
+	}
+	//this->currentDir=this->&root; //spöke
+	std::cout<<std::endl<<"this->currentDir pekar på: "<<this->currentDir->myFolderName<<" som har "<<this->currentDir->folderVec.size()<<" mappar."<<std::endl;
+	for (int h = 0; h < this->currentDir->folderVec.size(); h++)
+	{
+		std::cout<<this->currentDir->folderVec[h].myFolderName<<std::endl;
+	}
 }
 
 void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
 {
-	currentDir = dir;
+	this->currentDir = dir;
+	std::cout<<"current folder is: "<<this->currentDir->myFolderName<<std::endl;
+	std::cout<<"and my parent is: "<<this->currentDir->parent->myFolderName<<std::endl;
 	std::string line;
 	int tmp;
 	int tmp2;
@@ -231,7 +256,7 @@ void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
 		name = line.substr(0, pos);
 		content = line.substr(pos+1);
 		int error=createFile(name, content);
-		std::cout<<"error check 3: "<< name << " " << content << "error: " << error <<std::endl;
+		std::cout<<"error check 3: "<< name << " " << content << " error: " << error <<std::endl;
 		std::cout<<PrintFileContent(name)<<std::endl;
 	}
 	for (int j = 0; j < tmp; j++)
@@ -239,8 +264,19 @@ void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
 		std::getline(file, line);
 		std::cout<<"error check 4: "<< line <<std::endl;
 		CreateFolder(line);
-		recursiveFunction(&currentDir->folderVec[j], file);
+		recursiveFunction(&this->currentDir->folderVec[j], file);
 	}
 	
-	currentDir = currentDir->parent;
+	this->currentDir = this->currentDir->parent;
+	std::cout<<"i went back to: "<<this->currentDir->myFolderName<<std::endl;
+}
+
+void FileSystem::test()
+{
+	std::cout<<std::endl<<"this->currentDir pekar på: "<<this->currentDir->myFolderName<<" som har "<<this->currentDir->folderVec.size()<<" mappar."<<std::endl;
+	std::cout<<"min pappa heter: "<<this->currentDir->parent->myFolderName<<std::endl;
+	for (int h = 0; h < this->currentDir->folderVec.size(); h++)
+	{
+		std::cout<<this->currentDir->folderVec[h].myFolderName<<std::endl;
+	}
 }

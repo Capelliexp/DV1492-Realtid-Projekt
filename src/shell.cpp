@@ -5,12 +5,12 @@
 #include "filesystem.h"
 
 const int MAXCOMMANDS = 8;
-const int NUMAVAILABLECOMMANDS = 15;
+const int NUMAVAILABLECOMMANDS = 16;
 bool test;
 
 std::string availableCommands[NUMAVAILABLECOMMANDS] = {
     "quit","format","ls","create","cat","createImage","restoreImage",
-    "rm","cp","append","mv","mkdir","cd","pwd","help"
+    "rm","cp","append","mv","mkdir","cd","pwd","help","test"
 };
 
 /* Takes usercommand from input and returns number of commands, commands are stored in strArr[] */
@@ -93,7 +93,15 @@ int main(void) {
             case 6: // restoreImage
 			{
 				userCommand.erase(0, 13);
+                currentDir = "/";
 				f = FileSystem();
+                bool hoho = f.GoToFolder("..");
+                if (hoho)
+                {
+                    std::cout<<"true!"<<std::endl;
+                }
+                else
+                    std::cout<<"false!"<<std::endl;
 				f.restoreImage(userCommand);
 				break;
 			}
@@ -165,6 +173,10 @@ int main(void) {
 
             case 14: // help
                 std::cout << help() << std::endl;
+                break;
+
+            case 15: // test
+                f.test();
                 break;
 
             default:
