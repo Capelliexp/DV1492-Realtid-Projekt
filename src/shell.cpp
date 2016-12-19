@@ -6,7 +6,7 @@
 
 const int MAXCOMMANDS = 8;
 const int NUMAVAILABLECOMMANDS = 16;
-bool test;
+std::string test;
 
 std::string availableCommands[NUMAVAILABLECOMMANDS] = {
     "quit","format","ls","create","cat","createImage","restoreImage",
@@ -95,13 +95,7 @@ int main(void) {
 				userCommand.erase(0, 13);
                 currentDir = "/";
 				f = FileSystem();
-                bool hoho = f.GoToFolder("..");
-                if (hoho)
-                {
-                    std::cout<<"true!"<<std::endl;
-                }
-                else
-                    std::cout<<"false!"<<std::endl;
+                f.GoToFolder("..");
 				f.restoreImage(userCommand);
 				break;
 			}
@@ -141,8 +135,19 @@ int main(void) {
             case 12:{ // cd
                 userCommand.erase (0,3);
                 test = f.GoToFolder(userCommand);
+				if (userCommand=="..")
+				{
+					size_t pos = currentDir.rfind("/");
+					if (pos != 0)
+						currentDir = currentDir.substr(0, pos);
+					else
+						currentDir = currentDir.substr(0, 1);
+				}
+				else
+					currentDir = currentDir + test;
+				
 
-				if (test == true && currentDir == "/") {
+				/*if (test == true && currentDir == "/") {
 					currentDir = currentDir + userCommand;
 				}
                 else if(test == true && userCommand==".."){
@@ -160,7 +165,7 @@ int main(void) {
 				else
 				{
 					break;
-				}
+				}*/
                 break;
             }
 

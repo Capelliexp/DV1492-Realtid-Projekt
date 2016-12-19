@@ -117,15 +117,67 @@ void FileSystem::RemoveFolder(std::string folderName){
 // 		return true;
 // }
 
-bool FileSystem::GoToFolder(std::string folderName){
+std::string FileSystem::GoToFolder(std::string folderName)
+{
+	std::string tmpName = folderName;
+	std::string roadRunner = "";
 	if (folderName==".." && this->currentDir->myFolderName=="/")
 	{
 		this->currentDir = this->currentDir->parent;
-		return false;
+		return "";
+	}
+	else if (folderName=="..")
+	{
+		this->currentDir = this->currentDir->parent;
+		return "";
+	}
+	else
+	{
+		bool tmp = true;
+		do
+		{
+			size_t pos = tmpName.find("/");
+			if (pos != std::string::npos)
+			{
+				const Folder tmpFolder(tmpName.substr(0, pos), nullptr);
+				auto it = std::find(this->currentDir->folderVec.begin(), this->currentDir->folderVec.end(), tmpFolder);
+
+				if (it != this->currentDir->folderVec.end())
+				{
+					int index = std::distance(this->currentDir->folderVec.begin(), it);
+					this->currentDir = &this->currentDir->folderVec[index];
+				}
+				else
+				{
+					std::cout << "you ended with a slash, lel" << std::endl;
+					tmp = true;
+				}		
+			}
+			else
+			{
+				const Folder tmpFolder(tmpName, nullptr);
+				auto it = std::find(this->currentDir->folderVec.begin(), this->currentDir->folderVec.end(), tmpFolder);
+
+				if (it != this->currentDir->folderVec.end())
+				{
+					int index = std::distance(this->currentDir->folderVec.begin(), it);
+					this->currentDir = &this->currentDir->folderVec[index];
+				}
+				else
+				{
+					std::cout << "No such folder" << std::endl;
+					return false;
+				}
+				tmp = false;
+			}
+		
+			
+			//tmp = false;
+		} while (tmp);
+		
 	}
 
-	return true;
-	tim ska fixa
+	return true; need to fix this shiet!
 }
 
 void FileSystem::listDir(){

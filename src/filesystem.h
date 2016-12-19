@@ -84,7 +84,7 @@ public:
     void RemoveFolder(std::string folderName);
 
     // /* Function will move the current location to a specified location in the filesystem */
-    bool GoToFolder(std::string folderName);
+    std::string GoToFolder(std::string folderName);
 
     void listDir();
 
