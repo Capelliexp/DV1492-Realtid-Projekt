@@ -11,9 +11,6 @@ class FileSystem
 private:
     MemBlockDevice mMemblockDevice;
 
-
-    // Here you can add your own data structures
-
     class File {
     public:
         std::string name;
@@ -86,10 +83,8 @@ public:
     // /* Function will move the current location to a specified location in the filesystem */
     std::string GoToFolder(std::string folderName);
 
-    void listDir();
-
     // /* This function will get all the files and folders in the specified folder */
-    std::string ListContent();
+	std::string ListContent(std::string input);
 
     std::string PrintFileContent(std::string fileName);
 

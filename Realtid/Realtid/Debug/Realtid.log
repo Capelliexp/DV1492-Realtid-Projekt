@@ -1,7 +1,7 @@
 ﻿  filesystem.cpp
-d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(274): warning C4018: '<': signed/unsigned mismatch
-d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(280): warning C4018: '<': signed/unsigned mismatch
-d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(330): warning C4018: '<': signed/unsigned mismatch
+d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(279): warning C4018: '<': signed/unsigned mismatch
+d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(285): warning C4018: '<': signed/unsigned mismatch
+d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(335): warning C4018: '<': signed/unsigned mismatch
 c:\program files (x86)\microsoft visual studio 14.0\vc\include\xutility(2372): warning C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
   c:\program files (x86)\microsoft visual studio 14.0\vc\include\xutility(2372): note: see declaration of 'std::copy::_Unchecked_iterators::_Deprecate'
   d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(40): note: see reference to function template instantiation '_OutIt *std::copy<std::_String_iterator<std::_String_val<std::_Simple_types<char>>>,char*>(_InIt,_InIt,_OutIt)' being compiled
@@ -10,6 +10,5 @@ c:\program files (x86)\microsoft visual studio 14.0\vc\include\xutility(2372): w
               _OutIt=char *,
               _InIt=std::_String_iterator<std::_String_val<std::_Simple_types<char>>>
           ]
-d:\git repos\dv1492-realtid-projekt\src\filesystem.cpp(181): warning C4715: 'FileSystem::GoToFolder': not all control paths return a value
   Realtid.vcxproj -> D:\Git Repos\DV1492-Realtid-Projekt\Realtid\Debug\Realtid.exe
   Realtid.vcxproj -> D:\Git Repos\DV1492-Realtid-Projekt\Realtid\Debug\Realtid.pdb (Full PDB)

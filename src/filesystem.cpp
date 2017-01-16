@@ -9,8 +9,8 @@
 
 FileSystem::FileSystem() {
 	this->root = Folder("/");
-	this->currentDir = &root;
-	this->root.parent = currentDir;
+	this->currentDir = &this->root;
+	this->root.parent = this->currentDir;
 
 
 	// Blocket under ger ett enkelt filsystem
@@ -69,7 +69,22 @@ void FileSystem::removeFile(std::string fileName){
 }
 
 void FileSystem::CreateFolder(std::string folderName){
+	Folder* origFolder = this->currentDir;
+	bool repeat = true;
+
+	while(repeat){
+		size_t pos = folderName.find("/");
+		if (pos != 0 && pos != folderName.npos){	//hittade ett '/'
+			std::string newfolderName = folderName.substr(0, pos);
+			std::string resp = GoToFolder(newfolderName);	//gå in i mappen innan '/'
+			folderName.erase(0, pos+1);
+		}
+		else {	//hittar inget mer '/'
+			repeat = false;
+		}
+	}
 	this->currentDir->folderVec.push_back(Folder(folderName , this->currentDir));
+	this->currentDir = origFolder;	//gå tillbaka till originalmappen
 }
 
 void FileSystem::RemoveFolder(std::string folderName){
@@ -80,53 +95,16 @@ void FileSystem::RemoveFolder(std::string folderName){
 		this->currentDir->folderVec.erase(it);
  }
 
-/* bool FileSystem::GoToFolder(std::string folderName){
- 	std::string name="";
- 	int length=folderName.length();
- 	char * entireDir = new char [length+1];
-   	std::strcpy(entireDir, folderName.c_str());
-
-   	for(int i=0;i<=length;i++){
-   		if((entireDir[i]=='/' && i != 0) || (i == length && name!="")){
- 			if(name == ".."){
- 				if(this->currentDir == &root)
- 				{
- 					this->currentDir = this->currentDir->parent;
- 					return false;
- 				}
- 				else
- 					this->currentDir = this->currentDir->parent;
- 				}
- 			else{
- 				const Folder tmp(name,nullptr);
- 		 		auto it = std::find(this->currentDir->folderVec.begin(), this->currentDir->folderVec.end(), tmp);
-
- 				if (it != this->currentDir->folderVec.end()) {
- 					int index = std::distance(this->currentDir->folderVec.begin(), it);
- 					this->currentDir = &this->currentDir->folderVec[index];
- 					name = "";
- 					i++;
- 				}
- 				else
- 					return false;
- 				}
-   		}
-
-   		name += entireDir[i];
-   	}
- 		return true;
- }*/
-
 std::string FileSystem::GoToFolder(std::string folderName)
 {
 	std::string tmpName = folderName;
 	std::string roadRunner = "";
-	if (folderName==".." && this->currentDir->myFolderName=="/")
+	if (folderName == ".." && this->currentDir->myFolderName == "/")
 	{
 		this->currentDir = this->currentDir->parent;
 		return "";
 	}
-	else if (folderName=="..")
+	else if (folderName == "..")
 	{
 		this->currentDir = this->currentDir->parent;
 		return "";
@@ -145,12 +123,23 @@ std::string FileSystem::GoToFolder(std::string folderName)
 				if (it != this->currentDir->folderVec.end())
 				{
 					int index = std::distance(this->currentDir->folderVec.begin(), it);
+					if (this->currentDir->myFolderName == "/")
+					{
+						roadRunner = roadRunner + tmpName.substr(0, pos);
+					}
+					else
+					{
+						roadRunner = roadRunner + "/" + tmpName.substr(0, pos);
+					}
 					this->currentDir = &this->currentDir->folderVec[index];
+					tmpName = tmpName.substr(pos + 1);
 				}
 				else
 				{
-					std::cout << "you ended with a slash, lel" << std::endl;
-					tmp = true;
+					//std::cout << "you ended with a slash, lel" << std::endl;
+					//size_t pos = roadRunner.rfind("/");
+					//roadRunner = roadRunner.substr(0, pos);
+					tmp = false;
 				}
 			}
 			else
@@ -161,12 +150,15 @@ std::string FileSystem::GoToFolder(std::string folderName)
 				if (it != this->currentDir->folderVec.end())
 				{
 					int index = std::distance(this->currentDir->folderVec.begin(), it);
+					if (this->currentDir->myFolderName == "/")
+					{
+						roadRunner += tmpName;
+					}
+					else
+					{
+						roadRunner = roadRunner + "/" + tmpName;
+					}
 					this->currentDir = &this->currentDir->folderVec[index];
-				}
-				else
-				{
-					std::cout << "No such folder" << std::endl;
-					return false;
 				}
 				tmp = false;
 			}
@@ -177,23 +169,37 @@ std::string FileSystem::GoToFolder(std::string folderName)
 
 	}
 
-	return true; need to fix this shiet!
+	return roadRunner;
 }
 
-void FileSystem::listDir(){
-
-}
-
-std::string FileSystem::ListContent(){
+std::string FileSystem::ListContent(std::string input) {
 	std::string rtn;
-	for (const auto & item : this->currentDir->folderVec) {
-		rtn += item.myFolderName + "\n";
-	}
+	if (input == "")
+	{
+		for (const auto & item : this->currentDir->folderVec) {
+			rtn += item.myFolderName + "\n";
+		}
 
 
-	for (const auto & thing : this->currentDir->fileVec) {
-		rtn += thing.name + "\n";
+		for (const auto & thing : this->currentDir->fileVec) {
+			rtn += thing.name + "\n";
+		}
 	}
+	else
+	{
+		Folder* baseFolder = this->currentDir;
+		std::string tmp = GoToFolder(input);
+		for (const auto & item : this->currentDir->folderVec) {
+			rtn += item.myFolderName + "\n";
+		}
+
+
+		for (const auto & thing : this->currentDir->fileVec) {
+			rtn += thing.name + "\n";
+		}
+		this->currentDir = baseFolder;
+	}
+
 	return rtn;
 }
 
@@ -234,7 +240,6 @@ void FileSystem::CreateImage(std::string sysName)
 	//file.open(sysName);
 	recursiveCreate(this->currentDir, file);
 	file.close();
-
 }
 
 void FileSystem::recursiveCreate(Folder * dir, std::ofstream &file)

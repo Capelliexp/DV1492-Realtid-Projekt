@@ -53,7 +53,8 @@ int main(void) {
                 
 
 			case 2: { // ls
-				std::string returnValue = f.ListContent();
+				userCommand.erase(0, 3);
+				std::string returnValue = f.ListContent(userCommand);
 				std::cout << returnValue << std::endl;
 				break;
 			}
@@ -99,7 +100,6 @@ int main(void) {
 				f.restoreImage(userCommand);
 				break;
 			}
-                
 
             case 7:{ // rm
                 userCommand.erase (0,3);
@@ -145,27 +145,6 @@ int main(void) {
 				}
 				else
 					currentDir = currentDir + test;
-				
-
-				/*if (test == true && currentDir == "/") {
-					currentDir = currentDir + userCommand;
-				}
-                else if(test == true && userCommand==".."){
-                  //auto it = std::find(currentDir.rbegin(), currentDir.rend(), "/");
-                  //currentDir.erase(it,currentDir.end());
-                  size_t pos = currentDir.rfind("/");
-				  if (pos != 0)
-					  currentDir = currentDir.substr(0, pos);
-				  else
-					  currentDir = currentDir.substr(0, 1);
-                }
-                else if(test == true){
-                  currentDir = currentDir + "/" + userCommand;
-                }
-				else
-				{
-					break;
-				}*/
                 break;
             }
 
@@ -205,6 +184,7 @@ int parseCommandString(const std::string &userCommand, std::string strArr[]) {
     }
     return counter;
 }
+
 int findCommand(std::string &command) {
     int index = -1;
     for (int i = 0; i < NUMAVAILABLECOMMANDS && index == -1; ++i) {
