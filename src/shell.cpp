@@ -95,6 +95,8 @@ int main(void) {
 			{
 				userCommand.erase(0, 13);
                 currentDir = "/";
+				FileSystem g;
+				f = g;
 				f = FileSystem();
                 f.GoToFolder("..");
 				f.restoreImage(userCommand);

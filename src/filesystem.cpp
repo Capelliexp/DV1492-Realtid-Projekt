@@ -12,7 +12,6 @@ FileSystem::FileSystem() {
 	this->currentDir = &this->root;
 	this->root.parent = this->currentDir;
 
-
 	// Blocket under ger ett enkelt filsystem
 	/*this->root.folderVec.push_back(Folder("A", &this->root));
 	this->root.folderVec.push_back(Folder("B", &this->root));
@@ -28,11 +27,9 @@ FileSystem::FileSystem() {
 	this->currentDir = &root;
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A11", &this->root.folderVec[0].folderVec[0]));
 	this->root.folderVec[0].folderVec[0].folderVec.push_back(Folder("A12", &this->root.folderVec[0].folderVec[0]));*/
-
-
 }
 
-FileSystem::~FileSystem() {
+FileSystem::~FileSystem(){
 }
 
 int FileSystem::createFile(std::string fileName, std::string content) {
@@ -101,7 +98,7 @@ std::string FileSystem::GoToFolder(std::string folderName)
 	std::string roadRunner = "";
 	if (folderName == ".." && this->currentDir->myFolderName == "/")
 	{
-		this->currentDir = this->currentDir->parent;
+		//this->currentDir = this->currentDir->parent;
 		return "";
 	}
 	else if (folderName == "..")
@@ -262,7 +259,7 @@ void FileSystem::recursiveCreate(Folder * dir, std::ofstream &file)
 }
 
 void FileSystem::restoreImage(std::string filePath) {
-	//this->currentDir = &root;
+	this->currentDir = &root;
 	//std::string line;
 	std::cout<<filePath<<std::endl;
 	std::ifstream myfile(filePath);
@@ -273,8 +270,10 @@ void FileSystem::restoreImage(std::string filePath) {
 	}
 	else
 		std::cout<<"Can't file"<<std::endl;
+
+	//this->currentDir = &this->root;	//ny
 	myfile.close();
-	//this->currentDir=&root;
+	this->currentDir=&root;
 	std::cout<<std::endl<<"this->currentDir pekar på: "<<this->currentDir->myFolderName<<" som har "<<this->currentDir->folderVec.size()<<" mappar."<<std::endl;
 	for (int h = 0; h < this->currentDir->folderVec.size(); h++)
 	{
@@ -330,6 +329,7 @@ void FileSystem::recursiveFunction(Folder * dir, std::ifstream &file)
 
 void FileSystem::test()
 {
+	std::cout << "root heter: " << root.myFolderName << std::endl;
 	std::cout<<std::endl<<"this->currentDir pekar på: "<<this->currentDir->myFolderName<<" som har "<<this->currentDir->folderVec.size()<<" mappar."<<std::endl;
 	std::cout<<"min pappa heter: "<<this->currentDir->parent->myFolderName<<std::endl;
 	for (int h = 0; h < this->currentDir->folderVec.size(); h++)

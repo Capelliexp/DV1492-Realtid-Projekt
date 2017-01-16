@@ -57,7 +57,7 @@ private:
     };
 
     Folder root;
-    Folder * currentDir;
+    Folder *currentDir;
 
 public:
     FileSystem();
