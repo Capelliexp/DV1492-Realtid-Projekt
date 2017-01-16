@@ -10,7 +10,7 @@ class FileSystem
 {
 private:
     MemBlockDevice mMemblockDevice;
-	
+
 
     // Here you can add your own data structures
 
@@ -61,7 +61,7 @@ private:
 
     Folder root;
     Folder * currentDir;
-	
+
 public:
     FileSystem();
     ~FileSystem();
@@ -95,8 +95,6 @@ public:
 
     bool CopyFile(std::string file1, std::string file2);
 
-    // Folder GetCurrentFolder(std::string currentDir);   //har jag skapat
-
 	void restoreImage(std::string filePath);
 	//void recursiveFunction(std::string name, int nrOfFolders, int nrOfFiles);
 	void recursiveFunction(Folder * dir, std::ifstream &file);
@@ -107,7 +105,7 @@ public:
 
     void test();
 
-	
+
 };
 
 #endif // FILESYSTEM_H

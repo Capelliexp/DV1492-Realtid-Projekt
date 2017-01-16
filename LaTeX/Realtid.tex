@@ -29,9 +29,7 @@
 
 \begin{document}
 
-\title{Projekt}
-%\subtitle{Realtid- och Operativsystem}
-\course{Realtid- och operativsystem, DV1492}
+\title{Projekt i Realtid- och Operativsystem}
 \author{Tim Nyman, Filip Pentikäinen}
 \date{\today}
 \maketitle
@@ -53,13 +51,17 @@ Ett filsystem lagrar information över en lång tid på en hårddisk (kallad sek
 
 Användaren av datorn ska kunna organisera information på det sätt användaren vill, detta kräver att filsystemet ska kunna vara flexibelt i hur användaren ser sina filer och mappar. Sättet som moderna filsystem till persondatorer hanterar detta är att skapa en trädstruktur av mappar och filer som sedan refererar till dess lagrade data på disken. Eftersom all data av filsystemet sparas på samma medium (om inte RAID används) kan man flytta hårddisken till olika datorer utan att filstrukturen ändras. Flera olika filsystem kan användas på samma hårddisk genom partitionering, dock kommer användaren se hårddisken som 2 olika hårddiskar då 2 format på filsystem inte kan kombineras.
 \subsection{Resurser}
-Ett flertal hjälpfiler var tillgängliga till laboranterna. Dessa var kompilerings- och headerfilerna av block, blockdevice, memblockdevice, filesystem och shell. Dessa filer innehöll den grundläggande strukturen för kommandorutan och allokering av virtuellt minne. Flera funktioner som hanterar filers skriv- och läsfunktioner är från början implementerade. Detta gör att det laboranten ska implementera är funktioner som utför grundläggande linux kommandon för mapp- och filhantering. Dessa funktioner ska då hantera blockobjekt för att spara filer. Funktionerna ska även kunna organisera mappar och filer i en trädstruktur som användaren skapar.
+Ett flertal hjälpfiler var tillgängliga till laboranterna. Dessa var kompilerings- och headerfilerna av block, blockdevice, memblockdevice, filesystem och shell. Dessa filer innehöll den grundläggande strukturen för kommandorutan och allokering av virtuellt minne. 
+
+Flera funktioner som hanterar filers skriv- och läsfunktioner är från början implementerade. Detta gör att det laboranten ska implementera är funktioner som utför grundläggande linux kommandon för mapp- och filhantering. Dessa funktioner ska då hantera blockobjekt för att spara filer. Funktionerna ska även kunna organisera mappar och filer i en trädstruktur som användaren skapar.
 
 \section{Uppgift}
 \subsection{Metod}
 Då vi endast ville uppfylla kraven för E krävdes det att Linux kommanden cd, mkdir, cp, ls, cat, rm, och pwd skulle implementeras. Kommandot format, som bygger upp ett tomt filsystem, quit, som avslutar programmet, createImage och restoreImage, som sparar och laddar ett filsystem respektive, skulle även implementeras.
 
-Vi implementerade 2 nya klasser; Folder och File. Varje Folder innehåller 2 vektorer, 1 för att hantera de underliggande mapparna och 1 för att hålla reda på de filer som ligger i mappen. Eftersom vi valde att inte använda oss av objekt i mappstrukturen innebär detta att vi inte behöver anropa delete[] när mappar eller filer raderas. Detta gör även att vi kunde använda de specifika vektor-funktionerna för att hantera listorna av mappar och filer. Filerna behöver även spara vilket block som håller i deras information, då informationen ska sparas i filsystemet. Detta görs genom att skapa en int array som är lika lång som antalet block i filsystemet och som är fylld med nollor när filsystemet är nytt. Varje array-index representerar ett blocknummer. När en fil ska sparas i ett block så kollar man på denna int array efter ett array-index som innehåller en nolla. Då man hittar denna plats anropar man memblockdevice för att skriva data till samma blocknummer som det array index vi hittade innan. När detta är gjort ändrar man int arrayens index värde från en nolla till en etta, vilket representerar att blocknummret innehåller data som tillhör en fil. Filen sparar även detta nummer för att man ska kunna få tag i filens innehåll av filen. Detta gör att filernas data och mapp- och filstrukturen är helt separata. När man gör en sökning genom mapparnas trädstruktur behöver inte filernas data analyseras i onödan.
+Vi implementerade 2 nya klasser; Folder och File. Varje Folder innehåller 2 vektorer, 1 för att hantera de underliggande mapparna och 1 för att hålla reda på de filer som ligger i mappen. Eftersom vi valde att inte använda oss av objekt i mappstrukturen innebär detta att vi inte behöver anropa delete[] när mappar eller filer raderas. Detta gör även att vi kunde använda de specifika vektor-funktionerna för att hantera listorna av mappar och filer. 
+
+Filerna behöver även spara vilket block som håller i deras information, då informationen ska sparas i filsystemet. Detta görs genom att skapa en int array som är lika lång som antalet block i filsystemet och som är fylld med nollor när filsystemet är nytt. Varje array-index representerar ett blocknummer. När en fil ska sparas i ett block så kollar man på denna int array efter ett array-index som innehåller en nolla. Då man hittar denna plats anropar man memblockdevice för att skriva data till samma blocknummer som det array index vi hittade innan. När detta är gjort ändrar man int arrayens index värde från en nolla till en etta, vilket representerar att blocknummret innehåller data som tillhör en fil. Filen sparar även detta nummer för att man ska kunna få tag i filens innehåll av filen. Detta gör att filernas data och mapp- och filstrukturen är helt separata. När man gör en sökning genom mapparnas trädstruktur behöver inte filernas data analyseras i onödan.
 
 Då när en fil raderas med rm -kommandot kommer en funktion kolla vilket blocknummer filen har och byter inte arrayens index värde till en nolla. Det är inte nödvändigt att rensa blocket då när en annan fil vill spara data kommer den skriva över datan som ligger i blocket. Om den nya datan är mindre än den förra datan gör det ingenting för en null-pointer kommer skapas efter den nya datan så när blocket ska läsas läser den inte ut mer data efter denna pekare.
 \subsection{Funktioner}
@@ -77,7 +79,7 @@ Tar in en string som blir namnet på Mappen. Sedan så skapar det en ny mapp i f
 Tar in namnet på mappen som ska tas bort. Sedan så skapar den en temporär mapp med samma namn för att kunna söka igenom foldervektorn efter en mapp med samma namn. Om den hittar en mapp med samma namn så tar funktionen bort den, annars händer inget.
 
 \item \textbf{\colorType{bool} \colorFunction{GoToFolder}(\colorType{string} folderName)} \\
-Tar in en string med namnet på filen vi vill gå till. Sedan så skapar funktionen en char array som den kopierar in strängen i.
+Tar in en string med namnet på filen vi vill gå till. Sedan så skapar funktionen en char array som den kopierar in strängen i. Om det är en korrekt filepath som matats in så tar den användaren dit. Även om det är flera så fungerar det t.ex “A/A1/A11” och “..” skickar en tillbaka en mapp.
 
 \item \textbf{\colorType{string} \colorFunction{ListContent}()} \\
 Denna funktion använder pekaren currentDir för att skriva ut innehållet i den mapp som användaren är i. Funktionen innehåller 2 loopar som först lägger till namnet på alla mappar i användarmappen i en string och sedan lägger på filnamnen efter det. Denna sträng returneras sedan.
@@ -91,13 +93,13 @@ Denna funktion tar som parameter 2 filnamn. Funktionen kommer då att hitta en f
 \item \textbf{\colorFunction{CreateImage}(\colorType{string} sysName)} \\
 Funktionen skapar en textfil med samma namn som sysName och fyller denna med nödvändig data för att bygga upp filsystemet igen. Detta görs med hjälp av funktionen recursiveCreate() som nämns härnest.
 
-\item \textbf{\colorFunction{recursiveCreate}(Folder* dir, ofstream \&file)} \\
+\item \textbf{\colorFunction{recursiveCreate}(\colorType{Folder*} dir, \colorType{ofstream} \&file)} \\
 Tar en huvudmapp och en textstream som parameter. Från huvudmappen skrivs sedan ut antalet mappar och antalet filer ut till filen. Sedan skrivs alla filers namn ut med dess innehåll därefter delat av ett “=”-tecken. Sedan följer utskrift av mappnamnen och ett anrop av recursiveCreate() efter varje utskrift där den mapp som precis skrivits ut används som parameter.
 
 \item \textbf{\colorFunction{restoreImage}(\colorType{string} filePath)} \\
 Funktionen tar som parameter en filväg till en textfil som skapats med CreateImage(). Från denna kommer funktionen återskapa det filsystem som sparats. Funktionen recursiveFunction() för att göra detta, beskrivning av denna följer.
 
-\item \textbf{\colorFunction{restoreImage}(Folder* dir, ifstream \&file)} \\
+\item \textbf{\colorFunction{restoreImage}(\colorType{Folder*} dir, \colorType{ifstream} \&file)} \\
 Tar en huvudmapp som parameter och återställer dess innehåll enligt textfilen som öppnas i restoreImage(). Först återställs mappens filer och sedan dess mappar. Vid varje skapad mapp kallas funktionen restoreImage() igen med den nya mappen som huvudmapp.
 \end{itemize}
 \subsection{Klassdiagram}
@@ -123,10 +125,10 @@ Alla funktioner för betyget E blev implementerat. Se bifogade C++ filer för k�
 
 \section{Avslutande}
 \subsection{Slutsats}
-Uppgiften var väl skapad för att ge laboranterna en djupare förståelse för filsystem och de vanligaste problemen ett man kan stöta på när man skapar ett format av filsystem. 
+Uppgiften var väl skapad för att ge laboranterna en djupare förståelse för filsystem och de vanligaste problemen ett man kan stöta på när man skapar ett format av filsystem. Vi lärde oss mycket om hanteringen av mapporganisation och svårigheterna med att kunna spara data på ett optimalt sätt. 
 
 \subsection{Tidsredovisning}
-Implementationen av filsystemet tog ca. 40 timmar och rapporten är skriven på 5 timmar.
+Implementationen av filsystemet tog ca. 40 timmar och rapporten är skriven på 6 timmar.
 
 \begin{thebibliography}{3}
 
